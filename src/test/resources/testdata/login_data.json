@@ -1,0 +1,51 @@
+{
+  "loginTests": [
+    {
+      "scenario": "Valid credentials - standard user",
+      "username": "testuser@example.com",
+      "password": "Test@1234",
+      "expectSuccess": true
+    },
+    {
+      "scenario": "Invalid password",
+      "username": "testuser@example.com",
+      "password": "WrongPassword",
+      "expectSuccess": false
+    },
+    {
+      "scenario": "Non-existent user",
+      "username": "nouser@example.com",
+      "password": "Test@1234",
+      "expectSuccess": false
+    },
+    {
+      "scenario": "SQL injection attempt",
+      "username": "' OR '1'='1",
+      "password": "' OR '1'='1",
+      "expectSuccess": false
+    },
+    {
+      "scenario": "XSS attempt",
+      "username": "<script>alert('xss')</script>",
+      "password": "Test@1234",
+      "expectSuccess": false
+    }
+  ],
+  "forgotPasswordTests": [
+    {
+      "scenario": "Valid email for reset",
+      "email": "testuser@example.com",
+      "expectSuccess": true
+    },
+    {
+      "scenario": "Invalid email format",
+      "email": "notanemail",
+      "expectSuccess": false
+    },
+    {
+      "scenario": "Unregistered email",
+      "email": "nobody@nowhere.com",
+      "expectSuccess": false
+    }
+  ]
+}

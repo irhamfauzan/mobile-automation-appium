@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+
+    <Properties>
+        <Property name="LOG_DIR">test-output/logs</Property>
+        <Property name="LOG_FILE">${LOG_DIR}/automation_${date:yyyy-MM-dd}.log</Property>
+        <Property name="PATTERN">%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+        <!-- ANSI color pattern for console -->
+        <Property name="COLOR_PATTERN">%d{HH:mm:ss.SSS} [%t] %highlight{%-5level}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=green, DEBUG=cyan, TRACE=white} %style{%logger{36}}{blue} - %msg%n</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- Colored console output -->
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="${COLOR_PATTERN}" disableAnsi="false"/>
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+        </Console>
+
+        <!-- Debug console (shows all levels) -->
+        <Console name="DebugConsole" target="SYSTEM_OUT">
+            <PatternLayout pattern="${COLOR_PATTERN}" disableAnsi="false"/>
+            <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
+        </Console>
+
+        <!-- Rolling file appender -->
+        <RollingFile name="FileAppender"
+                     fileName="${LOG_FILE}"
+                     filePattern="${LOG_DIR}/automation_%d{yyyy-MM-dd}_%i.log.gz">
+            <PatternLayout pattern="${PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="20MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+
+        <!-- Error-only file -->
+        <RollingFile name="ErrorFileAppender"
+                     fileName="${LOG_DIR}/errors_${date:yyyy-MM-dd}.log"
+                     filePattern="${LOG_DIR}/errors_%d{yyyy-MM-dd}_%i.log.gz">
+            <PatternLayout pattern="${PATTERN}"/>
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- Framework loggers - DEBUG level -->
+        <Logger name="com.mobile.automation" level="DEBUG" additivity="false">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Logger>
+
+        <!-- Appium / Selenium - INFO to avoid noise -->
+        <Logger name="io.appium" level="INFO" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+        </Logger>
+        <Logger name="org.openqa.selenium" level="WARN" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+        </Logger>
+
+        <!-- Apache HttpClient - WARN only -->
+        <Logger name="org.apache.http" level="WARN" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+        </Logger>
+
+        <Root level="INFO">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="FileAppender"/>
+        </Root>
+    </Loggers>
+
+</Configuration>
