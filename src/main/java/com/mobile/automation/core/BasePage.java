@@ -2,8 +2,8 @@ package com.mobile.automation.core;
 
 import com.mobile.automation.utils.LogUtil;
 import com.mobile.automation.utils.ScreenshotUtil;
-import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.InteractsWithApps;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.*;
@@ -203,11 +203,13 @@ public abstract class BasePage {
     // ─── App control ─────────────────────────────────────────────────────────
 
     protected void launchApp() {
-        driver.activateApp(driver.getCapabilities().getCapability("appium:appPackage").toString());
+        String appId = getAppId();
+        ((InteractsWithApps) driver).activateApp(appId);
     }
 
     protected void closeApp() {
-        driver.terminateApp(driver.getCapabilities().getCapability("appium:appPackage").toString());
+        String appId = getAppId();
+        ((InteractsWithApps) driver).terminateApp(appId);
     }
 
     protected void resetApp() {
@@ -216,7 +218,15 @@ public abstract class BasePage {
     }
 
     protected void background(int seconds) {
-        driver.runAppInBackground(Duration.ofSeconds(seconds));
+        ((InteractsWithApps) driver).runAppInBackground(Duration.ofSeconds(seconds));
+    }
+
+    private String getAppId() {
+        Object pkg = driver.getCapabilities().getCapability("appium:appPackage");
+        if (pkg != null) return pkg.toString();
+        Object bundle = driver.getCapabilities().getCapability("appium:bundleId");
+        if (bundle != null) return bundle.toString();
+        throw new IllegalStateException("No appPackage or bundleId capability set");
     }
 
     // ─── Screenshot helper ───────────────────────────────────────────────────
