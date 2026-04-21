@@ -21,7 +21,7 @@ on:
         options: [smoke, regression, data-driven]
 
 env:
-  JAVA_VERSION: '11'
+  JAVA_VERSION: '21'
   NODE_VERSION: '18'
 
 jobs:
