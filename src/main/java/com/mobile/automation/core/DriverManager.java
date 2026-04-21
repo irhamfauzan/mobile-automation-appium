@@ -126,7 +126,9 @@ public class DriverManager {
         AppiumDriver driver = driverThreadLocal.get();
         if (driver == null) return false;
         try {
-            driver.getCurrentPackage();
+            // getCapabilities() is always available on AppiumDriver (inherited from RemoteWebDriver)
+            // and throws if the session is dead — safe on both Android and iOS
+            driver.getCapabilities();
             return true;
         } catch (Exception e) {
             return false;
